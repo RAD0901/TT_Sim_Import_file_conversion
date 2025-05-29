@@ -1,0 +1,6 @@
+@echo off
+echo Running Git Repository Cleanup Script...
+powershell -ExecutionPolicy Bypass -File clean_git_repo.ps1
+echo.
+echo Press any key to close this window...
+pause > nul
