@@ -1,0 +1,6 @@
+@echo off
+echo Running SIM Management Application build script...
+powershell -ExecutionPolicy Bypass -File build_app.ps1
+echo.
+echo Press any key to close this window...
+pause > nul

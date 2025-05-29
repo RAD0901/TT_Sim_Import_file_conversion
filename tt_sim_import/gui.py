@@ -15,6 +15,7 @@ from constants import COLORS
 from providers import select_provider, create_logo_canvas
 from import_utils import import_sims
 from export_utils import export_import_csv
+from resource_path import resource_path
 
 # Store the app logo as a global variable to prevent garbage collection
 app_logo_image = None
@@ -30,13 +31,8 @@ def load_app_logo(parent, width=200):
         tk.Label: The label containing the logo
     """
     global app_logo_image
-    
-    # Get the current file's directory
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # Look in the assets folder
-    assets_folder = os.path.join(current_dir, "assets")
-    logo_path = os.path.join(assets_folder, "New_Amecor_Logo.png")
+      # Use the resource_path helper to get the correct path whether we're running from source or as a frozen app
+    logo_path = resource_path(os.path.join("tt_sim_import", "assets", "New_Amecor_Logo.png"))
     
     try:
         if os.path.exists(logo_path):

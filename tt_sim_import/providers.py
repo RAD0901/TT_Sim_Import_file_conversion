@@ -10,6 +10,7 @@ import os
 import time
 from PIL import Image, ImageTk
 from constants import COLORS
+from resource_path import resource_path
 
 # Store the PhotoImage objects as global variables to prevent garbage collection
 logo_images = {}
@@ -178,21 +179,11 @@ def create_logo_canvas(parent, color, provider_name, width=100, height=100):
         "highlightbackground": border_color,
         "highlightcolor": border_color
     }
-    
-    # Define the path to the logo image
+      # Define the path to the logo image
     logo_filename = f"{provider_name.lower()}.png"
     
-    # Get the current file's directory
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # First try looking directly in the assets folder inside the tt_sim_import directory
-    assets_folder = os.path.join(current_dir, "assets")
-    logo_path = os.path.join(assets_folder, logo_filename)
-    
-    # If not found, try one directory up
-    if not os.path.exists(logo_path):
-        assets_folder = os.path.join(current_dir, "..", "assets")
-        logo_path = os.path.join(assets_folder, logo_filename)
+    # Use the resource_path helper to get the correct path whether we're running from source or as a frozen app
+    logo_path = resource_path(os.path.join("tt_sim_import", "assets", logo_filename))
     
     print(f"Attempting to load logo from: {logo_path}")
     
