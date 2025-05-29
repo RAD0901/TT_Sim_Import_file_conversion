@@ -9,10 +9,59 @@ import tkinter as tk
 from tkinter import ttk
 import ctypes
 import sys
+import os
+from PIL import Image, ImageTk
 from constants import COLORS
 from providers import select_provider, create_logo_canvas
 from import_utils import import_sims
 from export_utils import export_import_csv
+
+# Store the app logo as a global variable to prevent garbage collection
+app_logo_image = None
+
+def load_app_logo(parent, width=200):
+    """Load and display the Amecor logo.
+    
+    Args:
+        parent (tk.Widget): Parent widget for the logo
+        width (int, optional): Desired width of the logo. Height will be calculated proportionally.
+        
+    Returns:
+        tk.Label: The label containing the logo
+    """
+    global app_logo_image
+    
+    # Get the current file's directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Look in the assets folder
+    assets_folder = os.path.join(current_dir, "assets")
+    logo_path = os.path.join(assets_folder, "New_Amecor_Logo.png")
+    
+    try:
+        if os.path.exists(logo_path):
+            # Load and resize the logo image
+            original_img = Image.open(logo_path)
+            
+            # Calculate height to maintain aspect ratio
+            aspect_ratio = original_img.height / original_img.width
+            height = int(width * aspect_ratio)
+            
+            # Resize the image
+            resized_img = original_img.resize((width, height), Image.Resampling.LANCZOS)
+            
+            # Convert to PhotoImage
+            app_logo_image = ImageTk.PhotoImage(resized_img)
+            
+            # Create a label to display the logo
+            logo_label = tk.Label(parent, image=app_logo_image, bg=COLORS["background"])
+            return logo_label
+            
+    except Exception as e:
+        print(f"Error loading app logo: {e}")
+    
+    # Return None if logo couldn't be loaded
+    return None
 
 def create_gui():
     """Function to create a modern GUI for SIM Management with improved resolution."""
@@ -47,21 +96,23 @@ def create_gui():
                    font=('Segoe UI', 11))
     style.configure('TButton', background=COLORS["primary"], foreground="white", 
                    font=('Segoe UI', 11, 'bold'))
-    style.configure('Secondary.TButton', background=COLORS["secondary"])
-    
-    # Create header frame
+    style.configure('Secondary.TButton', background=COLORS["secondary"])    # Create header frame
     header_frame = ttk.Frame(root, style='TFrame')
     header_frame.pack(fill=tk.X, padx=20, pady=(20, 10))
     
     # App title - white text on blue background
     title_label = tk.Label(header_frame, 
-                          text="Techtool SIM Card Import file generator", 
+                          text="Techtool SIM Data Import file generator", 
                           font=('Segoe UI', 18, 'bold'),
                           bg=COLORS["background"],
                           fg="white")
     title_label.pack(side=tk.LEFT)
     
-    # Main content frame with card-like appearance - now using light gray
+    # Load and display the Amecor logo in the header
+    logo_label = load_app_logo(header_frame, width=80)
+    if logo_label:
+        logo_label.pack(side=tk.RIGHT, padx=10)
+      # Main content frame with card-like appearance - now using light gray
     main_frame = tk.Frame(root, bg=COLORS["card_bg"], 
                          padx=30, 
                          pady=30, 
@@ -70,6 +121,16 @@ def create_gui():
     main_frame.pack(fill=tk.BOTH, expand=True, 
                    padx=20, 
                    pady=20)
+    
+    # Create logo section at top of main content area
+    logo_section = tk.Frame(main_frame, bg=COLORS["card_bg"])
+    logo_section.pack(fill=tk.X, pady=(0, 20))
+    
+    # Add the Amecor logo larger and centered in the main content area
+    main_logo = load_app_logo(logo_section, width=250)
+    if main_logo:
+        main_logo.configure(bg=COLORS["card_bg"])
+        main_logo.pack(anchor=tk.CENTER)
     
     # Provider selection section - now with light gray background
     provider_section = tk.Frame(main_frame, bg=COLORS["card_bg"])
@@ -171,7 +232,7 @@ def create_gui():
     actions_title.pack(anchor=tk.W)
     
     actions_desc = tk.Label(buttons_section, 
-                          text="Import SIM cards and then export data for Techtool", 
+                          text="Import SIM Data and then export data for Techtool", 
                           font=('Segoe UI', 10),
                           bg=COLORS["card_bg"],
                           fg=COLORS["text"])
